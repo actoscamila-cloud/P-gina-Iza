@@ -1,0 +1,6 @@
+{
+  "name": "ROONES PERFORMANCE",
+  "description": "Iza: Inteligência Comercial para Clínicas de Estética. A IA da Roones que prepara sua equipe para vender melhor e transformar oportunidades em vendas.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

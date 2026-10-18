@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#0F0F0F" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Roones" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="description" content="Iza: Inteligência Comercial para Clínicas de Estética. A IA da Roones que prepara sua equipe para vender melhor e transformar oportunidades em vendas." />
+    <meta property="og:title" content="ROONES PERFORMANCE" />
+    <meta property="og:description" content="Iza: Inteligência Comercial para Clínicas de Estética. A IA da Roones que prepara sua equipe para vender melhor e transformar oportunidades em vendas." />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>ROONES PERFORMANCE</title>
+    <style>
+      @keyframes roones-spin {
+        to { transform: rotate(360deg); }
+      }
+      .roones-loader-spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid rgba(201, 169, 110, 0.2);
+        border-top-color: #C9A96E;
+        border-radius: 50%;
+        animation: roones-spin 0.9s linear infinite;
+        margin-bottom: 16px;
+      }
+    </style>
+  </head>
+  <body style="margin: 0; background-color: #0F0F0F; color: #F3F3F3;">
+    <div id="root">
+      <!-- High-end initial loading state so mobile launch never renders a blank/black screen -->
+      <div id="roones-initial-shell" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <div class="roones-loader-spinner"></div>
+        <div style="color: #C9A96E; font-size: 14px; font-weight: 800; letter-spacing: 0.28em; text-transform: uppercase;">
+          ROONES
+        </div>
+        <div style="color: rgba(255, 255, 255, 0.5); font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 4px;">
+          PERFORMANCE
+        </div>
+        <div style="color: rgba(255, 255, 255, 0.4); font-size: 11px; margin-top: 14px;">
+          Iniciando sistema...
+        </div>
+
+        <!-- Failsafe action that reveals automatically if mobile script loading hangs -->
+        <div id="roones-failsafe-box" style="display: none; margin-top: 24px; max-width: 280px;">
+          <p style="font-size: 11px; color: rgba(255, 255, 255, 0.6); margin-bottom: 12px; line-height: 1.4;">
+            O carregamento está demorando mais do que o esperado.
+          </p>
+          <button id="roones-reset-btn" onclick="window.__roonesResetApp()" style="background: #C9A96E; color: #0F0F0F; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em;">
+            Atualizar e Limpar Cache
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Self-healing recovery function accessible anywhere
+      window.__roonesResetApp = window.__vertusResetApp = async function() {
+        try {
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (const r of regs) await r.unregister();
+          }
+        } catch (e) {
+          console.warn('Cache reset warning:', e);
+        }
+        window.location.reload(true);
+      };
+
+      // If React fails to replace #roones-initial-shell within 6.5 seconds, reveal the recovery button
+      setTimeout(function() {
+        var failsafeBox = document.getElementById('roones-failsafe-box') || document.getElementById('vertus-failsafe-box');
+        if (failsafeBox && (document.getElementById('roones-initial-shell') || document.getElementById('vertus-initial-shell'))) {
+          failsafeBox.style.display = 'block';
+        }
+      }, 6500);
+
+      // Early capture of beforeinstallprompt so user clicks never miss the prompt event
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        window.__deferredPrompt = e;
+        window.dispatchEvent(new CustomEvent('roones:pwa-prompt-ready'));
+        window.dispatchEvent(new CustomEvent('vertus:pwa-prompt-ready'));
+      });
+
+      // Service Worker registration with instant update checks
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').then(function(reg) {
+            reg.update().catch(function() {});
+          }).catch(function(err) {
+            console.log('SW registration note:', err);
+          });
+        });
+      }
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

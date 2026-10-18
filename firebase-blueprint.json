@@ -1,0 +1,135 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile data including progress and points.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["CONSULTOR", "SUPER_ADMIN", "ROONES_ADMIN", "VERTUS_ADMIN"] },
+        "points": { "type": "number" },
+        "progress": { "type": "number" },
+        "avatar": { "type": "string" },
+        "clinicId": { "type": "string" },
+        "streak": { "type": "number" },
+        "completedModuleIds": { "type": "array", "items": { "type": "string" } },
+        "level": { "type": "number" },
+        "prestige": { "type": "string" },
+        "lastLoginDate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "email", "role", "points", "progress", "clinicId"]
+    },
+    "Track": {
+      "title": "Learning Track",
+      "description": "A collection of modules for learning.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "type": { "type": "string", "enum": ["TRACK", "CLASS"] },
+        "modules": { "type": "array", "items": { "$ref": "Module" } }
+      },
+      "required": ["id", "title", "description", "icon", "modules"]
+    },
+    "Module": {
+      "title": "Learning Module",
+      "description": "A single lesson within a track.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "content": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "points": { "type": "number" }
+      },
+      "required": ["id", "title", "description", "content", "points"]
+    },
+    "Objection": {
+      "title": "Sales Objection",
+      "description": "Common sales objections and expert responses.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "trigger": { "type": "string" },
+        "reason": { "type": "string" },
+        "expertView": { "type": "string" },
+        "rapportResponse": { "type": "string" },
+        "consultativeResponse": { "type": "string" },
+        "authorityResponse": { "type": "string" },
+        "response": { "type": "string" }
+      },
+      "required": ["id", "trigger", "response"]
+    },
+    "ChatSession": {
+      "title": "Chat Session",
+      "description": "A history of messages between a user and the IA.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "lastInteraction": { "type": "string", "format": "date-time" },
+        "isActive": { "type": "boolean" },
+        "messages": { 
+          "type": "array", 
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": { "type": "string", "enum": ["user", "ai"] },
+              "text": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" }
+            }
+          }
+        }
+      },
+      "required": ["id", "userId", "messages", "lastInteraction", "isActive"]
+    },
+    "AppConfig": {
+      "title": "App Configuration",
+      "description": "Global settings for the application.",
+      "type": "object",
+      "properties": {
+        "aiPrompt": { "type": "string" },
+        "dailyChallenge": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "question": { "type": "string" },
+            "options": { "type": "array", "items": { "type": "string" } },
+            "correctAnswer": { "type": "number" },
+            "points": { "type": "number" },
+            "active": { "type": "boolean" }
+          }
+        }
+      },
+      "required": ["aiPrompt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents."
+    },
+    "/tracks/{trackId}": {
+      "schema": "Track",
+      "description": "Learning tracks."
+    },
+    "/objections/{objectionId}": {
+      "schema": "Objection",
+      "description": "Sales objections."
+    },
+    "/chatSessions/{sessionId}": {
+      "schema": "ChatSession",
+      "description": "User chat histories."
+    },
+    "/config/app": {
+      "schema": "AppConfig",
+      "description": "Global application configuration."
+    }
+  }
+}
